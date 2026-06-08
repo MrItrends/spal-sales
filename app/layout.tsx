@@ -86,7 +86,65 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {/* ── Native preloader — renders before any JS, hides the flash ── */}
+        <div
+          id="spal-preloader"
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 99999,
+            background: "#ffffff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "opacity 0.7s cubic-bezier(0.4,0,0.2,1)",
+          }}
+        >
+          {/* Glow */}
+          <div style={{
+            position: "absolute",
+            width: 500,
+            height: 500,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(34,197,94,0.18) 0%, rgba(47,99,245,0.08) 50%, transparent 70%)",
+            animation: "preloader-pulse 2s ease-in-out infinite",
+          }} />
+          {/* Logo */}
+          <img
+            src="/spal-wordmark.png"
+            alt="SPAL"
+            style={{ height: 48, width: "auto", filter: "brightness(0) invert(1)", position: "relative", zIndex: 1 }}
+          />
+          {/* Progress bar */}
+          <div style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            height: 2,
+            background: "#22c55e",
+            animation: "preloader-bar 1.8s cubic-bezier(0.4,0,0.2,1) forwards",
+          }} />
+        </div>
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            function hide() {
+              var el = document.getElementById('spal-preloader');
+              if (!el) return;
+              el.style.opacity = '0';
+              el.style.pointerEvents = 'none';
+              setTimeout(function() { el.remove(); }, 750);
+            }
+            if (document.readyState === 'complete') {
+              setTimeout(hide, 600);
+            } else {
+              window.addEventListener('load', function() { setTimeout(hide, 400); }, { once: true });
+              setTimeout(hide, 4000);
+            }
+          })();
+        `}} />
+        {children}
+      </body>
     </html>
   );
 }
