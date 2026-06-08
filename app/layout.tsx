@@ -48,9 +48,9 @@ export default function RootLayout({
           type="text/tailwindcss"
           dangerouslySetInnerHTML={{
             __html: `
-              @keyframes preloader-pulse {
-                0%, 100% { transform: scale(1); opacity: 0.8; }
-                50%       { transform: scale(1.15); opacity: 1; }
+              @keyframes preloader-breathe {
+                0%, 100% { transform: scale(1);    opacity: 1; }
+                50%       { transform: scale(1.12); opacity: 0.75; }
               }
               @keyframes preloader-bar {
                 0%   { width: 0%; opacity: 1; }
@@ -101,20 +101,11 @@ export default function RootLayout({
             transition: "opacity 0.7s cubic-bezier(0.4,0,0.2,1)",
           }}
         >
-          {/* Glow */}
-          <div style={{
-            position: "absolute",
-            width: 500,
-            height: 500,
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(34,197,94,0.18) 0%, rgba(47,99,245,0.08) 50%, transparent 70%)",
-            animation: "preloader-pulse 2s ease-in-out infinite",
-          }} />
-          {/* Logo */}
+          {/* Logo — breathes in and out */}
           <img
             src="/spal-wordmark.png"
             alt="SPAL"
-            style={{ height: 48, width: "auto", filter: "brightness(0) invert(1)", position: "relative", zIndex: 1 }}
+            style={{ height: 72, width: "auto", position: "relative", zIndex: 1, animation: "preloader-breathe 1.4s ease-in-out infinite" }}
           />
           {/* Progress bar */}
           <div style={{
