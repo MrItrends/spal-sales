@@ -496,12 +496,12 @@ function FeaturesSection() {
                     <p className="font-['Satoshi'] font-bold text-[16px] text-[#0f172a] leading-[24px]">{feat.title}</p>
                     <p className="font-['Satoshi'] text-[13px] text-[#0f172a] mt-1 leading-[20px]">{feat.desc}</p>
                   </div>
-                  {/* component image */}
+                  {/* component image — left-aligned to match text */}
                   <img
                     src={feat.comp}
                     alt={feat.title}
-                    className="absolute left-1/2 block"
-                    style={{ top: 100, width: Math.min(feat.compW, 280), transform: "translateX(-50%)" }}
+                    className="absolute block"
+                    style={{ top: 100, left: 20, width: Math.min(feat.compW, 260) }}
                   />
                 </div>
               )}
