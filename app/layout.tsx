@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  icons: { icon: "/favicon.png" },
+  icons: { icon: "/favicon.webp" },
   title: "SPAL — Your AI Business Companion",
   description:
     "SPAL helps small business owners in Africa track spending, spot profits, and grow with confidence. Join the waitlist.",
@@ -106,13 +106,13 @@ export default function RootLayout({
         />
 
         {/* Preload hero image so it's ready before preloader exits */}
-        <link rel="preload" href="/phonemockupanddata.png" as="image" />
-        <link rel="preload" href="/spal-wordmark.png" as="image" />
+        <link rel="preload" href="/phonemockupanddata.webp" as="image" />
+        <link rel="preload" href="/spal-wordmark.webp" as="image" />
       </head>
       <body>
         {/* Preloader — styled via plain CSS above, shows on first byte */}
         <div id="spal-preloader">
-          <img src="/spal-wordmark.png" alt="SPAL" />
+          <img src="/spal-wordmark.webp" alt="SPAL" />
         </div>
         {children}
       </body>

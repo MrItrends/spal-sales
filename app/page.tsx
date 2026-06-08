@@ -55,34 +55,34 @@ function scrollToHeroEmail() {
 
 // ─── Figma assets (downloaded to /public/figma/) ────────────────────────────────
 const STAT_LEFT_BG    = "/figma/stat-left-bg.jpg";
-const BLUE_CARD_PHOTO = "/figma/blue-card-photo.png";
-const FEATURE_BG      = "/figma/feature-bg.png";
+const BLUE_CARD_PHOTO = "/figma/blue-card-photo.webp";
+const FEATURE_BG      = "/figma/feature-bg.webp";
 // Feature section — backgrounds and component images (dropped in /public/)
-const FB_SALES_BG      = "/Track Sales Background.png";
-const FB_SALES_COMP    = "/Track sales component.png";
-const FB_EXPENSE_BG    = "/Track Expense Background.png";
-const FB_EXPENSE_COMP  = "/Track Expense Component.png";
-const FB_INSIGHTS_BG   = "/Insights Background.png";
-const FB_INSIGHTS_COMP = "/Insights Component.png";
-const FB_ASKSPAL_BG    = "/Ask Spal Background.png";
-const FB_ASKSPAL_COMP  = "/Ask Spal Component.png";
-const FB_COACH_BG      = "/Business Coach Background.png";
-const FB_COACH_COMP    = "/Business Coach Component.png";
-const FB_GOALS_BG      = "/Goals Background.png";
-const FB_GOALS_COMP    = "/Goals Component.png";
-const PHONE_SCREEN    = "/figma/phone-screen.png";
-const HUSTLER_PHOTO   = "/figma/hustler-photo.png";
-const HUSTLER_RIGHT   = "/figma/hustler-right.png";
-const OPERATOR_PHOTO  = "/figma/operator-photo.png";
-const OPERATOR_RIGHT  = "/figma/operator-right.png";
-const BUILDER_PHOTO   = "/The ambitious builder icon.png";
-const BUILDER_RIGHT   = "/The ambitious builder image.png";
-const OWNER_PHOTO     = "/the business owner icon.png";
-const OWNER_RIGHT     = "/the business owner image.png";
-const AVATAR1         = "/figma/avatar1.png";
-const AVATAR2         = "/figma/avatar2.png";
-const AVATAR3         = "/figma/avatar3.png";
-const AVATAR4         = "/figma/avatar4.png";
+const FB_SALES_BG      = "/Track Sales Background.webp";
+const FB_SALES_COMP    = "/Track sales component.webp";
+const FB_EXPENSE_BG    = "/Track Expense Background.webp";
+const FB_EXPENSE_COMP  = "/Track Expense Component.webp";
+const FB_INSIGHTS_BG   = "/Insights Background.webp";
+const FB_INSIGHTS_COMP = "/Insights Component.webp";
+const FB_ASKSPAL_BG    = "/Ask Spal Background.webp";
+const FB_ASKSPAL_COMP  = "/Ask Spal Component.webp";
+const FB_COACH_BG      = "/Business Coach Background.webp";
+const FB_COACH_COMP    = "/Business Coach Component.webp";
+const FB_GOALS_BG      = "/Goals Background.webp";
+const FB_GOALS_COMP    = "/Goals Component.webp";
+const PHONE_SCREEN    = "/figma/phone-screen.webp";
+const HUSTLER_PHOTO   = "/figma/hustler-photo.webp";
+const HUSTLER_RIGHT   = "/figma/hustler-right.webp";
+const OPERATOR_PHOTO  = "/figma/operator-photo.webp";
+const OPERATOR_RIGHT  = "/figma/operator-right.webp";
+const BUILDER_PHOTO   = "/The ambitious builder icon.webp";
+const BUILDER_RIGHT   = "/The ambitious builder image.webp";
+const OWNER_PHOTO     = "/the business owner icon.webp";
+const OWNER_RIGHT     = "/the business owner image.webp";
+const AVATAR1         = "/figma/avatar1.webp";
+const AVATAR2         = "/figma/avatar2.webp";
+const AVATAR3         = "/figma/avatar3.webp";
+const AVATAR4         = "/figma/avatar4.webp";
 
 // ─── Arrow icon (diagonal ↗ matching Figma) ──────────────────────────────────────
 function ArrowIcon() {
@@ -168,7 +168,7 @@ function Navbar({ onJoin }: { onJoin: () => void; }) {
       <div className="flex items-center justify-between w-full max-w-[1440px] mx-auto">
         <div className="h-[37px] w-auto flex items-center">
           <img
-            src="/spal-wordmark.png"
+            src="/spal-wordmark.webp"
             alt="SPAL"
             className="h-full w-auto object-contain"
             onError={(e) => { (e.target as HTMLImageElement).src = "/spal-wordmark.svg"; }}
@@ -276,7 +276,7 @@ function Hero() {
           {/* Phone + data cards — mt-8 = same 32px gap after form, bleeds below card via overflow:hidden */}
           <div className="mt-8 w-full">
             <img
-              src="/phonemockupanddata.png"
+              src="/phonemockupanddata.webp"
               alt="SPAL app with data"
               className="w-full block"
               fetchPriority="high"
@@ -330,7 +330,7 @@ function StatCards() {
         <Reveal delay={0}><div className="relative rounded-[24px] overflow-hidden h-[324px]">
           <img src={STAT_LEFT_BG} alt="" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute top-5 left-5 right-5 flex items-center justify-between">
-            <img src="/spal-wordmark.png" alt="SPAL" className="h-6 brightness-0 invert" onError={(e) => { (e.target as HTMLImageElement).src = "/spal-wordmark.svg"; }} />
+            <img src="/spal-wordmark.webp" alt="SPAL" className="h-6 brightness-0 invert" onError={(e) => { (e.target as HTMLImageElement).src = "/spal-wordmark.svg"; }} />
             <div className="w-10 h-10 bg-[#fe5900] rounded-[12px] flex items-center justify-center">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <rect x="2" y="4" width="16" height="13" rx="2" stroke="white" strokeWidth="1.5"/>
@@ -793,7 +793,7 @@ function Footer() {
       {/* Big logo */}
       <div className="flex justify-center py-16 px-4">
         <img
-          src="/Spal Logo_Footer.png"
+          src="/Spal Logo_Footer.webp"
           alt="SPAL"
           style={{ height: "clamp(60px,10vw,160px)", width: "auto" }}
         />
