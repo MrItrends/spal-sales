@@ -549,12 +549,14 @@ function FeaturesSection() {
 
           <div className="w-full max-w-[1392px] mx-auto pl-[132px] pr-[52px]">
 
-            {/* section header */}
-            <div className="flex justify-between items-start mb-10 gap-6">
-              <h2 className="font-['Satoshi'] font-medium text-[#0f172a] leading-[1.17]" style={{ fontSize: "clamp(24px,2.5vw,36px)" }}>
-                Run your business<br />with confidence
-              </h2>
-              <p className="font-['Satoshi'] text-[16px] text-[#0f172a] max-w-[480px] leading-[24px] tracking-[0.16px]">
+            {/* section header — mirrors the tabs+panel column layout so text aligns with panel */}
+            <div className="flex gap-[146px] items-start mb-10">
+              <div style={{ width: 515, flexShrink: 0 }}>
+                <h2 className="font-['Satoshi'] font-medium text-[#0f172a] leading-[1.17]" style={{ fontSize: "clamp(24px,2.5vw,36px)" }}>
+                  Run your business<br />with confidence
+                </h2>
+              </div>
+              <p className="font-['Satoshi'] text-[16px] text-[#0f172a] leading-[24px] tracking-[0.16px]" style={{ flex: 1 }}>
                 Track sales and expenses, understand your profits, get AI-powered guidance, set growth goals, and receive personalized business coaching built for everyday entrepreneurs.
               </p>
             </div>
