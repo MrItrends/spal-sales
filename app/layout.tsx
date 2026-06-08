@@ -52,10 +52,10 @@ export default function RootLayout({
                 0%, 100% { transform: scale(1);    opacity: 1; }
                 50%       { transform: scale(1.12); opacity: 0.75; }
               }
-              @keyframes preloader-bar {
-                0%   { width: 0%; opacity: 1; }
-                80%  { width: 90%; opacity: 1; }
-                100% { width: 100%; opacity: 0; }
+              @keyframes preloader-exit {
+                0%   { opacity: 1; visibility: visible; }
+                80%  { opacity: 1; visibility: visible; }
+                100% { opacity: 0; visibility: hidden; }
               }
               @keyframes rocket-liftoff {
                 0%, 50%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -87,7 +87,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        {/* ── Native preloader — renders before any JS, hides the flash ── */}
+        {/* ── Native preloader — pure CSS, no script, no hydration issues ── */}
         <div
           id="spal-preloader"
           style={{
@@ -98,42 +98,16 @@ export default function RootLayout({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            transition: "opacity 0.7s cubic-bezier(0.4,0,0.2,1)",
+            animation: "preloader-exit 2.4s ease forwards",
+            pointerEvents: "none",
           }}
         >
-          {/* Logo — breathes in and out */}
           <img
             src="/spal-wordmark.png"
             alt="SPAL"
-            style={{ height: 72, width: "auto", position: "relative", zIndex: 1, animation: "preloader-breathe 1.4s ease-in-out infinite" }}
+            style={{ height: 72, width: "auto", animation: "preloader-breathe 1.2s ease-in-out infinite" }}
           />
-          {/* Progress bar */}
-          <div style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            height: 2,
-            background: "#22c55e",
-            animation: "preloader-bar 1.8s cubic-bezier(0.4,0,0.2,1) forwards",
-          }} />
         </div>
-        <script dangerouslySetInnerHTML={{ __html: `
-          (function() {
-            function hide() {
-              var el = document.getElementById('spal-preloader');
-              if (!el) return;
-              el.style.opacity = '0';
-              el.style.pointerEvents = 'none';
-              setTimeout(function() { el.remove(); }, 750);
-            }
-            if (document.readyState === 'complete') {
-              setTimeout(hide, 600);
-            } else {
-              window.addEventListener('load', function() { setTimeout(hide, 400); }, { once: true });
-              setTimeout(hide, 4000);
-            }
-          })();
-        `}} />
         {children}
       </body>
     </html>
