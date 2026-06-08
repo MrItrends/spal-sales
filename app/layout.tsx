@@ -40,23 +40,42 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
+
+        {/* ── Preloader CSS — plain <style>, loads instantly before any CDN ── */}
+        <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes preloader-breathe {
+            0%, 100% { transform: scale(1);    opacity: 1; }
+            50%       { transform: scale(1.12); opacity: 0.75; }
+          }
+          @keyframes preloader-exit {
+            0%   { opacity: 1; visibility: visible; pointer-events: all; }
+            75%  { opacity: 1; visibility: visible; pointer-events: all; }
+            100% { opacity: 0; visibility: hidden;  pointer-events: none; }
+          }
+          #spal-preloader {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: preloader-exit 2.6s ease forwards;
+          }
+          #spal-preloader img {
+            height: 72px;
+            width: auto;
+            animation: preloader-breathe 1.2s ease-in-out infinite;
+          }
+        `}} />
+
         {/* Tailwind v4 CDN — processes utility classes browser-side */}
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" async />
-        {/* @theme tokens exposed to Tailwind v4 CDN */}
         {/* eslint-disable-next-line @next/next/no-css-tags */}
         <style
           type="text/tailwindcss"
           dangerouslySetInnerHTML={{
             __html: `
-              @keyframes preloader-breathe {
-                0%, 100% { transform: scale(1);    opacity: 1; }
-                50%       { transform: scale(1.12); opacity: 0.75; }
-              }
-              @keyframes preloader-exit {
-                0%   { opacity: 1; visibility: visible; }
-                80%  { opacity: 1; visibility: visible; }
-                100% { opacity: 0; visibility: hidden; }
-              }
               @keyframes rocket-liftoff {
                 0%, 50%, 100% { transform: translateY(0px) rotate(0deg); }
                 60%            { transform: translateY(-7px) rotate(-20deg); }
@@ -85,28 +104,15 @@ export default function RootLayout({
             `,
           }}
         />
+
+        {/* Preload hero image so it's ready before preloader exits */}
+        <link rel="preload" href="/phonemockupanddata.png" as="image" />
+        <link rel="preload" href="/spal-wordmark.png" as="image" />
       </head>
       <body>
-        {/* ── Native preloader — pure CSS, no script, no hydration issues ── */}
-        <div
-          id="spal-preloader"
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 99999,
-            background: "#ffffff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            animation: "preloader-exit 2.4s ease forwards",
-            pointerEvents: "none",
-          }}
-        >
-          <img
-            src="/spal-wordmark.png"
-            alt="SPAL"
-            style={{ height: 72, width: "auto", animation: "preloader-breathe 1.2s ease-in-out infinite" }}
-          />
+        {/* Preloader — styled via plain CSS above, shows on first byte */}
+        <div id="spal-preloader">
+          <img src="/spal-wordmark.png" alt="SPAL" />
         </div>
         {children}
       </body>

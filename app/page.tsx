@@ -279,6 +279,7 @@ function Hero() {
               src="/phonemockupanddata.png"
               alt="SPAL app with data"
               className="w-full block"
+              fetchPriority="high"
             />
           </div>
         </div>
