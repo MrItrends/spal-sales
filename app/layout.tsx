@@ -29,8 +29,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        {/* DNS prefetch for external CDNs */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+
         {/* Fonts */}
         <link
           href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap"
@@ -41,17 +47,24 @@ export default function RootLayout({
           rel="stylesheet"
         />
 
-        {/* ── Preloader CSS — plain <style>, loads instantly before any CDN ── */}
+        {/*
+          ── Preloader CSS + body-lock ────────────────────────────────────────
+          Plain <style> — parsed on first byte, before any JS or CDN.
+          html.spal-loading hides all body content except the preloader so
+          nothing distorted is ever visible. JS in <head> removes the class
+          once window "load" fires (all resources ready).
+        */}
         <style dangerouslySetInnerHTML={{ __html: `
-          @keyframes preloader-breathe {
+          /* Hide everything except preloader until fully loaded */
+          html.spal-loading body > *:not(#spal-preloader) {
+            visibility: hidden;
+          }
+
+          @keyframes spal-breathe {
             0%, 100% { transform: scale(1);    opacity: 1; }
-            50%       { transform: scale(1.12); opacity: 0.75; }
+            50%       { transform: scale(1.08); opacity: 0.7; }
           }
-          @keyframes preloader-exit {
-            0%   { opacity: 1; visibility: visible; pointer-events: all; }
-            75%  { opacity: 1; visibility: visible; pointer-events: all; }
-            100% { opacity: 0; visibility: hidden;  pointer-events: none; }
-          }
+
           #spal-preloader {
             position: fixed;
             inset: 0;
@@ -60,34 +73,66 @@ export default function RootLayout({
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: preloader-exit 2.6s ease forwards;
           }
           #spal-preloader img {
-            height: 72px;
+            height: 44px;
             width: auto;
-            animation: preloader-breathe 1.2s ease-in-out infinite;
+            max-width: 55vw;
+            display: block;
+            animation: spal-breathe 1.3s ease-in-out infinite;
+          }
+          #spal-preloader.spal-exit {
+            transition: opacity 0.55s cubic-bezier(0.4,0,0.2,1);
+            opacity: 0;
+            pointer-events: none;
+          }
+
+          @keyframes rocket-liftoff {
+            0%, 50%, 100% { transform: translateY(0px) rotate(0deg); }
+            60%            { transform: translateY(-7px) rotate(-20deg); }
+            75%            { transform: translateY(-4px) rotate(-10deg); }
+            88%            { transform: translateY(1px) rotate(3deg); }
+            95%            { transform: translateY(0px) rotate(0deg); }
+          }
+          .rocket-anim {
+            display: inline-block;
+            animation: rocket-liftoff 3.2s ease-in-out infinite;
           }
         `}} />
 
-        {/* Tailwind v4 CDN — processes utility classes browser-side */}
+        {/*
+          ── Preloader controller ─────────────────────────────────────────────
+          Runs synchronously in <head> — sets spal-loading class immediately,
+          then removes preloader only after window "load" (all images + JS done).
+        */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            document.documentElement.classList.add('spal-loading');
+            function dismiss() {
+              var el = document.getElementById('spal-preloader');
+              if (!el) return;
+              document.documentElement.classList.remove('spal-loading');
+              el.classList.add('spal-exit');
+              setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 600);
+            }
+            if (document.readyState === 'complete') {
+              setTimeout(dismiss, 150);
+            } else {
+              window.addEventListener('load', function() { setTimeout(dismiss, 150); }, { once: true });
+            }
+            // Hard cap: never show more than 7s
+            setTimeout(dismiss, 7000);
+          })();
+        `}} />
+
+        {/* Tailwind v4 CDN */}
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" async />
         {/* eslint-disable-next-line @next/next/no-css-tags */}
         <style
           type="text/tailwindcss"
           dangerouslySetInnerHTML={{
             __html: `
-              @keyframes rocket-liftoff {
-                0%, 50%, 100% { transform: translateY(0px) rotate(0deg); }
-                60%            { transform: translateY(-7px) rotate(-20deg); }
-                75%            { transform: translateY(-4px) rotate(-10deg); }
-                88%            { transform: translateY(1px) rotate(3deg); }
-                95%            { transform: translateY(0px) rotate(0deg); }
-              }
-              .rocket-anim {
-                display: inline-block;
-                animation: rocket-liftoff 3.2s ease-in-out infinite;
-              }
-
               @theme {
                 --color-navy: #0F172A;
                 --color-cream: #F8F7F4;
@@ -105,12 +150,11 @@ export default function RootLayout({
           }}
         />
 
-        {/* Preload hero image so it's ready before preloader exits */}
-        <link rel="preload" href="/phonemockupanddata.webp" as="image" />
+        {/* Preload critical above-fold images */}
         <link rel="preload" href="/spal-wordmark.webp" as="image" />
+        <link rel="preload" href="/phonemockupanddata.webp" as="image" />
       </head>
-      <body>
-        {/* Preloader — styled via plain CSS above, shows on first byte */}
+      <body suppressHydrationWarning>
         <div id="spal-preloader">
           <img src="/spal-wordmark.webp" alt="SPAL" />
         </div>
