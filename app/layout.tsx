@@ -109,20 +109,48 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: `
           (function() {
             document.documentElement.classList.add('spal-loading');
+
+            // Probe element: Tailwind will set display:none when it processes 'hidden'
+            var probe = document.createElement('div');
+            probe.className = 'hidden';
+            probe.setAttribute('aria-hidden', 'true');
+            probe.style.cssText = 'position:absolute;width:1px;height:1px;pointer-events:none;';
+            document.documentElement.appendChild(probe);
+
+            var dismissed = false;
             function dismiss() {
+              if (dismissed) return;
+              dismissed = true;
               var el = document.getElementById('spal-preloader');
-              if (!el) return;
+              if (probe.parentNode) probe.parentNode.removeChild(probe);
               document.documentElement.classList.remove('spal-loading');
+              if (!el) return;
               el.classList.add('spal-exit');
-              setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 600);
+              setTimeout(function() { if (el && el.parentNode) el.parentNode.removeChild(el); }, 650);
             }
+
+            // Poll until Tailwind has applied styles (probe becomes display:none)
+            function waitForTailwind() {
+              if (window.getComputedStyle(probe).display === 'none') {
+                dismiss();
+              } else {
+                setTimeout(waitForTailwind, 40);
+              }
+            }
+
+            // Start polling after page load
+            function onLoad() {
+              waitForTailwind();
+            }
+
             if (document.readyState === 'complete') {
-              setTimeout(dismiss, 150);
+              onLoad();
             } else {
-              window.addEventListener('load', function() { setTimeout(dismiss, 150); }, { once: true });
+              window.addEventListener('load', onLoad, { once: true });
             }
-            // Hard cap: never show more than 7s
-            setTimeout(dismiss, 7000);
+
+            // Hard cap — never block more than 8s
+            setTimeout(dismiss, 8000);
           })();
         `}} />
 
