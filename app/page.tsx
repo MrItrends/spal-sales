@@ -404,56 +404,79 @@ const FEATURES_DATA = [
 ];
 
 
+// px of scroll consumed per feature step — drives both desktop scroll and mobile swipe threshold
+const FEATURE_STEP = 500;
+
 function FeaturesSection() {
   const [active, setActive] = useState(0);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const activeRef = useRef(0);
-  const wheelLocked = useRef(false);
+  const wrapperRef    = useRef<HTMLDivElement>(null);
+  const mobileRef     = useRef<HTMLDivElement>(null);
+  const touchStartY   = useRef(0);
+  const touchActive   = useRef(false);
   const N = FEATURES_DATA.length;
 
-  // Keep ref in sync so wheel handler never has a stale closure
-  useEffect(() => { activeRef.current = active; }, [active]);
-
-  // Desktop: intercept wheel events when the sticky section is in view.
-  // Advances/retreats features without adding extra page height.
-  // When at the first/last feature, wheel events pass through normally.
+  // ── DESKTOP: drive active feature from real scroll position ────────────────
+  // Works for mouse wheel, trackpad, scrollbar drag, keyboard — everything.
   useEffect(() => {
-    const onWheel = (e: WheelEvent) => {
+    const onScroll = () => {
       if (!wrapperRef.current) return;
-      const rect = wrapperRef.current.getBoundingClientRect();
-      // Section is "stuck" when its top edge is at the navbar bottom (98px)
-      const isSticky = rect.top <= 99 && rect.bottom >= window.innerHeight - 1;
-      if (!isSticky) return;
+      const sectionTop = wrapperRef.current.offsetTop;
+      // scrolledIn: how many px past the sticky point we've scrolled
+      const scrolledIn = window.scrollY - (sectionTop - 98);
+      if (scrolledIn < 0) { setActive(0); return; }
+      const next = Math.min(N - 1, Math.max(0, Math.floor(scrolledIn / FEATURE_STEP)));
+      setActive(next);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [N]);
 
-      const cur = activeRef.current;
-      const goNext = e.deltaY > 0 && cur < N - 1;
-      const goPrev = e.deltaY < 0 && cur > 0;
+  // ── MOBILE: touch-swipe cycles features; section traps touch while mid-list ─
+  useEffect(() => {
+    const el = mobileRef.current;
+    if (!el) return;
 
-      if (goNext || goPrev) {
-        // Intercept this wheel event so page doesn't scroll
-        e.preventDefault();
-        if (!wheelLocked.current) {
-          wheelLocked.current = true;
-          const next = goNext ? cur + 1 : cur - 1;
-          setActive(next);
-          activeRef.current = next;
-          // Cooldown prevents runaway trackpad momentum from skipping features
-          setTimeout(() => { wheelLocked.current = false; }, 650);
-        }
-      }
-      // At edges (first↑ or last↓): don't preventDefault → page scrolls normally
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartY.current = e.touches[0].clientY;
+      touchActive.current = true;
     };
 
-    window.addEventListener("wheel", onWheel, { passive: false });
-    return () => window.removeEventListener("wheel", onWheel);
-  }, [N]);
+    const onTouchMove = (e: TouchEvent) => {
+      if (!touchActive.current) return;
+      const delta = touchStartY.current - e.touches[0].clientY;
+      const cur = active; // closure — intentional, re-registers on active change
+      // Prevent page scroll only when we can still cycle (not at edges)
+      if ((delta > 0 && cur < N - 1) || (delta < 0 && cur > 0)) {
+        e.preventDefault();
+      }
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!touchActive.current) return;
+      touchActive.current = false;
+      const delta = touchStartY.current - e.changedTouches[0].clientY;
+      if (Math.abs(delta) < 40) return; // ignore tiny swipes
+      const cur = active;
+      if (delta > 0 && cur < N - 1) setActive(cur + 1);
+      if (delta < 0 && cur > 0)     setActive(cur - 1);
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove",  onTouchMove,  { passive: false });
+    el.addEventListener("touchend",   onTouchEnd,   { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove",  onTouchMove);
+      el.removeEventListener("touchend",   onTouchEnd);
+    };
+  }, [active, N]);
 
   const f = FEATURES_DATA[active];
 
   return (
     <>
-      {/* ── MOBILE (< lg): click to reveal ───────────────────────────────────── */}
-      <section className="lg:hidden px-4 py-20">
+      {/* ── MOBILE (< lg): swipe to cycle ────────────────────────────────────── */}
+      <section ref={mobileRef} className="lg:hidden px-4 py-20" style={{ touchAction: "pan-y" }}>
         {/* header */}
         <div className="mb-8">
           <h2 className="font-['Satoshi'] font-medium text-[#0f172a] leading-[1.17] mb-4" style={{ fontSize: "clamp(24px,6vw,36px)" }}>
@@ -463,7 +486,7 @@ function FeaturesSection() {
             Track sales and expenses, understand your profits, get AI-powered guidance, set growth goals, and receive personalized business coaching built for everyday entrepreneurs.
           </p>
         </div>
-        {/* accordion-style tabs */}
+        {/* feature list — tap or swipe to cycle */}
         <div className="flex flex-col gap-2">
           {FEATURES_DATA.map((feat, i) => (
             <div key={feat.id}>
@@ -490,14 +513,11 @@ function FeaturesSection() {
               </div>
               {i === active && (
                 <div className="mt-3 mb-3 rounded-[16px] overflow-hidden relative" style={{ height: 340 }}>
-                  {/* bg */}
                   <img src={feat.bg} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                  {/* title + desc */}
                   <div className="absolute top-5 left-5 right-5 z-10">
                     <p className="font-['Satoshi'] font-bold text-[16px] text-[#0f172a] leading-[24px]">{feat.title}</p>
                     <p className="font-['Satoshi'] text-[13px] text-[#0f172a] mt-1 leading-[20px]">{feat.desc}</p>
                   </div>
-                  {/* component image — left-aligned to match text */}
                   <img
                     src={feat.comp}
                     alt={feat.title}
@@ -509,18 +529,25 @@ function FeaturesSection() {
             </div>
           ))}
         </div>
+        {/* swipe hint dots */}
+        <div className="flex justify-center gap-2 mt-6">
+          {FEATURES_DATA.map((_, i) => (
+            <div key={i} onClick={() => setActive(i)} className="cursor-pointer"
+              style={{ width: 6, height: 6, borderRadius: "50%", background: i === active ? "#0f172a" : "#d1d5db", transition: "background 0.3s" }} />
+          ))}
+        </div>
       </section>
 
-      {/* ── DESKTOP (≥ lg): sticky scroll ─────────────────────────────────────── */}
+      {/* ── DESKTOP (≥ lg): scroll-position driven sticky ────────────────────── */}
       {/*
-        Wrapper is exactly 100vh — same footprint as any other section.
-        Feature cycling is driven by wheel-event interception (onWheel above),
-        not page-scroll position, so no extra height is needed.
+        Outer wrapper height = 100vh + (N-1)*FEATURE_STEP gives the page enough
+        scroll room for all feature transitions. Scroll position drives active
+        feature — works for wheel, trackpad, scrollbar drag, and keyboard equally.
       */}
       <div
         ref={wrapperRef}
         className="hidden lg:block"
-        style={{ height: "100vh" }}
+        style={{ height: `calc(100vh + ${(N - 1) * FEATURE_STEP}px)` }}
       >
         <div className="sticky top-[98px] flex items-center relative" style={{ height: "calc(100vh - 98px)" }}>
 
